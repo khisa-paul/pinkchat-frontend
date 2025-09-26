@@ -1,26 +1,34 @@
 import React, { useState } from "react";
+import { uploadStatus } from "../api";
 
 function StatusUploader({ socket, currentUser }) {
-  const [file, setFile] = useState(null);
+  const [text, setText] = useState("");
 
-  const uploadStatus = async () => {
-    if (!file) return;
-    const formData = new FormData();
-    formData.append("status", file);
-    formData.append("user", currentUser);
+  const handleUpload = async () => {
+    if (!text.trim()) return;
 
-    await fetch("http://localhost:5000/status", {
-      method: "POST",
-      body: formData,
-    });
+    try {
+      // Save to backend via REST API
+      await uploadStatus(currentUser, text);
 
-    socket.emit("statusUpdate", currentUser);
+      // Also emit via socket.io for realtime updates
+      socket.emit("status", { user: currentUser, text });
+
+      setText("");
+    } catch (err) {
+      console.error("Error uploading status:", err.message);
+    }
   };
 
   return (
     <div className="status-uploader">
-      <input type="file" onChange={(e) => setFile(e.target.files[0])} />
-      <button onClick={uploadStatus}>Post Status</button>
+      <input
+        type="text"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        placeholder="What's on your mind?"
+      />
+      <button onClick={handleUpload}>Post Status</button>
     </div>
   );
 }
