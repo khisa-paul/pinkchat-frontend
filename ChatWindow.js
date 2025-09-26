@@ -1,67 +1,69 @@
+// src/components/ChatWindow.js
 import React, { useEffect, useState } from "react";
-import { fetchMessages, sendMessage } from "../api";
+import axios from "axios";
+import { API_BASE } from "../config";
 
 function ChatWindow({ socket, currentUser }) {
   const [messages, setMessages] = useState([]);
-  const [text, setText] = useState("");
+  const [input, setInput] = useState("");
 
+  // ✅ Fetch existing messages from backend
   useEffect(() => {
-    async function loadMessages() {
+    const fetchMessages = async () => {
       try {
-        const data = await fetchMessages();
-        setMessages(data);
+        const res = await axios.get(`${API_BASE}/api/messages`);
+        setMessages(res.data);
       } catch (err) {
-        console.error("Error fetching messages:", err.message);
+        console.error("Failed to fetch messages:", err);
       }
-    }
+    };
+    fetchMessages();
+  }, []);
 
-    loadMessages();
-
-    // Listen for new messages in realtime
-    socket.on("message", (msg) => {
-      setMessages((prev) => [...prev, msg]);
+  // ✅ Listen for new messages via socket.io
+  useEffect(() => {
+    socket.on("receiveMessage", (message) => {
+      setMessages((prev) => [...prev, message]);
     });
 
-    return () => {
-      socket.off("message");
-    };
+    return () => socket.off("receiveMessage");
   }, [socket]);
 
-  const handleSend = async () => {
-    if (!text.trim()) return;
+  const sendMessage = async () => {
+    if (!input.trim()) return;
 
+    const newMessage = { sender: currentUser, text: input };
+
+    // Save to backend (this will also trigger socket broadcast)
     try {
-      // Save to backend via REST
-      await sendMessage(currentUser, text);
-
-      // Emit via socket for realtime
-      socket.emit("message", { user: currentUser, text });
-
-      setText("");
+      await axios.post(`${API_BASE}/api/messages`, newMessage);
     } catch (err) {
-      console.error("Error sending message:", err.message);
+      console.error("Failed to send message:", err);
     }
+
+    setInput("");
   };
 
   return (
     <div className="chat-window">
-      <h3>Chat</h3>
       <div className="messages">
-        {messages.map((m, idx) => (
-          <div key={idx}>
-            <strong>{m.user}:</strong> {m.text}
+        {messages.map((msg, i) => (
+          <div
+            key={i}
+            className={`message ${msg.sender === currentUser ? "self" : ""}`}
+          >
+            <strong>{msg.sender}:</strong> {msg.text}
           </div>
         ))}
       </div>
-
       <div className="input-area">
         <input
           type="text"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
+          value={input}
           placeholder="Type a message..."
+          onChange={(e) => setInput(e.target.value)}
         />
-        <button onClick={handleSend}>Send</button>
+        <button onClick={sendMessage}>Send</button>
       </div>
     </div>
   );
