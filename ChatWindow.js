@@ -1,69 +1,67 @@
 import React, { useEffect, useState } from "react";
+import { fetchMessages, sendMessage } from "../api";
 
 function ChatWindow({ socket, currentUser }) {
   const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState("");
-  const [typingUser, setTypingUser] = useState(null);
+  const [text, setText] = useState("");
 
   useEffect(() => {
-    socket.on("message", (msg) => setMessages((prev) => [...prev, msg]));
-    socket.on("typing", (user) => setTypingUser(user));
-    socket.on("stopTyping", () => setTypingUser(null));
-    socket.on("messageDelivered", (id) =>
-      setMessages((prev) =>
-        prev.map((m) => (m._id === id ? { ...m, delivered: true } : m))
-      )
-    );
-    socket.on("messageRead", (id) =>
-      setMessages((prev) =>
-        prev.map((m) => (m._id === id ? { ...m, read: true } : m))
-      )
-    );
+    async function loadMessages() {
+      try {
+        const data = await fetchMessages();
+        setMessages(data);
+      } catch (err) {
+        console.error("Error fetching messages:", err.message);
+      }
+    }
+
+    loadMessages();
+
+    // Listen for new messages in realtime
+    socket.on("message", (msg) => {
+      setMessages((prev) => [...prev, msg]);
+    });
+
+    return () => {
+      socket.off("message");
+    };
   }, [socket]);
 
-  const sendMessage = () => {
-    if (input.trim()) {
-      socket.emit("message", {
-        sender: currentUser,
-        receiver: "Bob", // demo user
-        text: input,
-      });
-      setInput("");
-    }
-  };
+  const handleSend = async () => {
+    if (!text.trim()) return;
 
-  const handleTyping = () => {
-    socket.emit("typing", "Bob");
-    clearTimeout(window.typingTimeout);
-    window.typingTimeout = setTimeout(() => {
-      socket.emit("stopTyping", "Bob");
-    }, 1500);
+    try {
+      // Save to backend via REST
+      await sendMessage(currentUser, text);
+
+      // Emit via socket for realtime
+      socket.emit("message", { user: currentUser, text });
+
+      setText("");
+    } catch (err) {
+      console.error("Error sending message:", err.message);
+    }
   };
 
   return (
     <div className="chat-window">
+      <h3>Chat</h3>
       <div className="messages">
-        {messages.map((m, i) => (
-          <div
-            key={i}
-            className={`message ${m.sender === currentUser ? "me" : "them"}`}
-          >
-            <span>{m.text}</span>
-            <small>{m.read ? "✓✓" : m.delivered ? "✓" : ""}</small>
+        {messages.map((m, idx) => (
+          <div key={idx}>
+            <strong>{m.user}:</strong> {m.text}
           </div>
         ))}
-        {typingUser && <p>{typingUser} is typing...</p>}
       </div>
+
       <div className="input-area">
         <input
-          value={input}
-          onChange={(e) => {
-            setInput(e.target.value);
-            handleTyping();
-          }}
+          type="text"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
           placeholder="Type a message..."
         />
-        <button onClick={sendMessage}>Send</button>
+        <button onClick={handleSend}>Send</button>
       </div>
     </div>
   );
