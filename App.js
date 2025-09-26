@@ -1,3 +1,4 @@
+// src/App.js
 import React, { useEffect, useState } from "react";
 import io from "socket.io-client";
 import ChatWindow from "./components/ChatWindow";
@@ -6,9 +7,9 @@ import StatusViewer from "./components/StatusViewer";
 import { subscribeToNotifications } from "./notifications";
 import { API_BASE } from "./config";
 
-// Connect socket.io to your Render backend
+// ✅ Connect socket.io directly to your Render backend
 const socket = io(API_BASE, {
-  transports: ["websocket"], 
+  transports: ["websocket", "polling"],
   withCredentials: true,
 });
 
