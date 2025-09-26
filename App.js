@@ -4,8 +4,13 @@ import ChatWindow from "./components/ChatWindow";
 import StatusUploader from "./components/StatusUploader";
 import StatusViewer from "./components/StatusViewer";
 import { subscribeToNotifications } from "./notifications";
+import { API_BASE } from "./config";
 
-const socket = io("http://localhost:5000"); // change to Render backend URL
+// Connect socket.io to your Render backend
+const socket = io(API_BASE, {
+  transports: ["websocket"], 
+  withCredentials: true,
+});
 
 function App() {
   const [user, setUser] = useState("Alice");
