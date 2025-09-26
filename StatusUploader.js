@@ -1,34 +1,45 @@
+// src/components/StatusUploader.js
 import React, { useState } from "react";
-import { uploadStatus } from "../api";
+import axios from "axios";
+import { API_BASE } from "../config";
 
-function StatusUploader({ socket, currentUser }) {
+function StatusUploader({ currentUser }) {
   const [text, setText] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
 
-  const handleUpload = async () => {
-    if (!text.trim()) return;
+  const uploadStatus = async () => {
+    if (!text && !imageUrl) return;
 
     try {
-      // Save to backend via REST API
-      await uploadStatus(currentUser, text);
-
-      // Also emit via socket.io for realtime updates
-      socket.emit("status", { user: currentUser, text });
-
+      await axios.post(`${API_BASE}/api/statuses`, {
+        user: currentUser,
+        text,
+        imageUrl,
+      });
       setText("");
+      setImageUrl("");
+      alert("✅ Status uploaded!");
     } catch (err) {
-      console.error("Error uploading status:", err.message);
+      console.error("Failed to upload status:", err);
     }
   };
 
   return (
     <div className="status-uploader">
+      <h3>Post a Status</h3>
       <input
         type="text"
         value={text}
+        placeholder="Say something..."
         onChange={(e) => setText(e.target.value)}
-        placeholder="What's on your mind?"
       />
-      <button onClick={handleUpload}>Post Status</button>
+      <input
+        type="text"
+        value={imageUrl}
+        placeholder="Image URL"
+        onChange={(e) => setImageUrl(e.target.value)}
+      />
+      <button onClick={uploadStatus}>Post</button>
     </div>
   );
 }
