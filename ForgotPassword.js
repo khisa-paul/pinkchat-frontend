@@ -1,27 +1,30 @@
-function ForgotPassword({ onSwitchPage }) {
-  const [phone, setPhone] = React.useState("");
+<script type="text/babel">
+  function ForgotPassword() {
+    const [email, setEmail] = React.useState("");
 
-  const handleReset = (e) => {
-    e.preventDefault();
-    alert(`Password reset link sent to phone: ${phone}`);
-    onSwitchPage("login");
-  };
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      alert(`Password reset link sent to: ${email}`);
+      // Add your password reset logic here
+    };
 
-  return (
-    <div className="login-box">
-      <h2>Forgot Password 💖</h2>
-      <form onSubmit={handleReset}>
-        <input
-          type="text"
-          placeholder="Enter Phone Number"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-        />
-        <button type="submit">Send Reset Link</button>
-      </form>
-      <p>
-        <a href="#" onClick={() => onSwitchPage("login")}>Back to Login</a>
-      </p>
-    </div>
-  );
-}
+    return (
+      <div>
+        <h2>Forgot Password</h2>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <br/>
+          <button type="submit">Send Reset Link</button>
+        </form>
+      </div>
+    );
+  }
+
+  window.ForgotPassword = ForgotPassword;
+</script>
