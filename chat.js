@@ -4,21 +4,36 @@ function Chat({ user, onLogout }) {
 
   const sendMessage = (e) => {
     e.preventDefault();
-    if (!input) return;
+    if (!input.trim()) return;
+
+    // Add new message
     setMessages([...messages, { user: user.username, text: input }]);
     setInput("");
   };
 
   return (
     <div className="chat-box">
-      <h2>Welcome {user?.username} 💖</h2>
-      <button onClick={onLogout}>Logout</button>
+      <header className="chat-header">
+        <h2>💬 PinkChat</h2>
+        <div>
+          <span>Logged in as <b>{user?.username}</b></span>
+          <button onClick={onLogout}>Logout</button>
+        </div>
+      </header>
+
       <div className="messages">
-        {messages.map((msg, i) => (
-          <p key={i}><b>{msg.user}:</b> {msg.text}</p>
-        ))}
+        {messages.length === 0 ? (
+          <p className="empty">No messages yet. Start chatting 💖</p>
+        ) : (
+          messages.map((msg, i) => (
+            <p key={i}>
+              <b>{msg.user}:</b> {msg.text}
+            </p>
+          ))
+        )}
       </div>
-      <form onSubmit={sendMessage}>
+
+      <form onSubmit={sendMessage} className="chat-input">
         <input
           type="text"
           placeholder="Type a message..."
