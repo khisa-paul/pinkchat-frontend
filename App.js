@@ -1,41 +1,20 @@
-import React, { useEffect, useState } from "react";
-import io from "socket.io-client";
-import ChatWindow from "./ChatWindow";
-import StatusUploader from "./StatusUploader";
-import StatusViewer from "./StatusViewer";
-import { subscribeToNotifications } from "./notifications";
-import { API_BASE } from "./config";
-import Login from "./Login";
+import React, { useState } from "react";
+import Login from "./Login.js";
+import Register from "./Register.js";
+import ForgotPassword from "./ForgotPassword.js";
+import Chat from "./Chat.js";
 
-// Connect socket.io to backend
-const socket = io(API_BASE, {
-  transports: ["websocket"],
-  withCredentials: true,
-});
-
-function App() {
+export default function App() {
+  const [page, setPage] = useState("login");
   const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    subscribeToNotifications();
-  }, []);
-
-  if (!user) {
-    return <Login setUser={setUser} />;
-  }
+  if (user) return <Chat user={user} />;
 
   return (
     <div className="app">
-      <header className="header">💖 PinkChat</header>
-      <div className="main">
-        <ChatWindow socket={socket} currentUser={user.username} />
-        <aside>
-          <StatusUploader socket={socket} currentUser={user.username} />
-          <StatusViewer socket={socket} />
-        </aside>
-      </div>
+      {page === "login" && <Login setPage={setPage} setUser={setUser} />}
+      {page === "register" && <Register setPage={setPage} />}
+      {page === "forgot" && <ForgotPassword setPage={setPage} />}
     </div>
   );
 }
-
-export default App;
