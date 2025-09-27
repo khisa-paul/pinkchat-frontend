@@ -1,24 +1,27 @@
-// src/App.js
 import React, { useEffect, useState } from "react";
 import io from "socket.io-client";
-import ChatWindow from "./components/ChatWindow";
-import StatusUploader from "./components/StatusUploader";
-import StatusViewer from "./components/StatusViewer";
-import { subscribeToNotifications } from "./notifications";
 import { API_BASE } from "./config";
+import { subscribeToNotifications } from "./notifications";
+import ChatWindow from "./ChatWindow";
+import StatusUploader from "./StatusUploader";
+import StatusViewer from "./StatusViewer";
+import Login from "./Login";
 
-// ✅ Connect socket.io directly to your Render backend
 const socket = io(API_BASE, {
-  transports: ["websocket", "polling"],
+  transports: ["websocket"],
   withCredentials: true,
 });
 
 function App() {
-  const [user, setUser] = useState("Alice");
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     subscribeToNotifications();
   }, []);
+
+  if (!user) {
+    return <Login setUser={setUser} />;
+  }
 
   return (
     <div className="app">
