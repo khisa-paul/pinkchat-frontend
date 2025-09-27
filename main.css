@@ -1,81 +1,94 @@
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #ffe6f0;
-  color: #333;
+import { API_BASE } from "./config.js";
+
+let socket = null;
+let currentUser = null;
+
+const root = document.getElementById("root");
+
+// ---------- Login UI ----------
+function renderLogin() {
+  root.innerHTML = `
+    <div class="login">
+      <h2>Login to PinkChat 💖</h2>
+      <input id="username" type="text" placeholder="Username" />
+      <input id="phone" type="text" placeholder="Phone number" />
+      <button id="loginBtn">Login</button>
+    </div>
+  `;
+
+  document.getElementById("loginBtn").addEventListener("click", () => {
+    const username = document.getElementById("username").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+
+    if (!username || !phone) {
+      alert("Please enter both username and phone number!");
+      return;
+    }
+
+    currentUser = { username, phone };
+
+    connectSocket();
+    renderChat();
+  });
 }
 
-.header {
-  background: #ff4da6;
-  color: white;
-  padding: 1rem;
-  font-size: 1.5rem;
-  text-align: center;
+// ---------- Chat UI ----------
+function renderChat() {
+  root.innerHTML = `
+    <header class="header">💖 PinkChat - ${currentUser.username}</header>
+    <div class="main">
+      <div class="chat">
+        <div id="messages"></div>
+        <input id="msgInput" type="text" placeholder="Type a message..." />
+        <button id="sendBtn">Send</button>
+      </div>
+      <aside>
+        <h3>Status</h3>
+        <p>Coming soon...</p>
+      </aside>
+    </div>
+  `;
+
+  document.getElementById("sendBtn").addEventListener("click", sendMessage);
 }
 
-.main {
-  display: flex;
-  gap: 1rem;
-  padding: 1rem;
+// ---------- Socket.IO ----------
+function connectSocket() {
+  socket = io(API_BASE, {
+    transports: ["websocket"],
+    withCredentials: true,
+  });
+
+  socket.on("connect", () => {
+    console.log("🟢 Connected:", socket.id);
+  });
+
+  socket.on("receiveMessage", (data) => {
+    showMessage(data);
+  });
 }
 
-.chat-window {
-  flex: 2;
-  background: white;
-  border-radius: 10px;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
+function sendMessage() {
+  const input = document.getElementById("msgInput");
+  const message = input.value.trim();
+  if (!message) return;
+
+  const data = {
+    user: currentUser.username,
+    phone: currentUser.phone,
+    text: message,
+  };
+
+  socket.emit("sendMessage", data);
+  input.value = "";
 }
 
-.messages {
-  flex: 1;
-  overflow-y: auto;
-  margin-bottom: 1rem;
+function showMessage(data) {
+  const messagesDiv = document.getElementById("messages");
+  const div = document.createElement("div");
+  div.textContent = `${data.user} (${data.phone}): ${data.text}`;
+  messagesDiv.appendChild(div);
 }
 
-.message {
-  margin: 5px 0;
-  padding: 8px 12px;
-  border-radius: 15px;
-  max-width: 70%;
-}
-
-.message.me {
-  background: #ff99cc;
-  align-self: flex-end;
-}
-
-.message.them {
-  background: #f8f8f8;
-  align-self: flex-start;
-}
-
-.input-area {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.input-area input {
-  flex: 1;
-  padding: 10px;
-  border: 1px solid #ff99cc;
-  border-radius: 20px;
-}
-
-.input-area button {
-  background: #ff4da6;
-  border: none;
-  color: white;
-  padding: 10px 15px;
-  border-radius: 20px;
-  cursor: pointer;
-}
-
-.status-uploader,
-.status-viewer {
-  flex: 1;
-  background: white;
-  border-radius: 10px;
-  padding: 1rem;
-}
+// ---------- Start ----------
+renderLogin();
