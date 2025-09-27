@@ -8,7 +8,22 @@
 </head>
 <body>
   <div id="root"></div>
-  <script src="main.js" type="module"></script>
+
+  <!-- React + ReactDOM -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+  <!-- App logic -->
+  <script type="text/babel" src="App.js"></script>
+  <script type="text/babel" src="Login.js"></script>
+  <script type="text/babel" src="Register.js"></script>
+  <script type="text/babel" src="ForgotPassword.js"></script>
+  <script type="text/babel" src="Chat.js"></script>
+
+  <!-- Start App -->
+  <script type="text/babel">
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
 </body>
 </html>
-
