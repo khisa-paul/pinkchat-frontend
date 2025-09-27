@@ -1,59 +1,39 @@
 import React, { useState } from "react";
-import { API_BASE } from "./config";
 
-function Login({ setUser }) {
-  const [username, setUsername] = useState("");
+export default function Login({ setPage, setUser }) {
   const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
 
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-
-    if (!username || !phone) {
-      alert("Both fields required");
-      return;
-    }
-
     try {
-      // Register/login request
-      const res = await fetch(`${API_BASE}/auth/login`, {
+      const res = await fetch("https://your-backend-url.onrender.com/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, phone }),
+        body: JSON.stringify({ phone, password }),
       });
-
       const data = await res.json();
-
-      if (res.ok) {
-        setUser(data.user);
-      } else {
-        alert(data.message || "Login failed");
-      }
-    } catch (err) {
-      console.error(err);
+      if (res.ok) setUser(data.user);
+      else alert(data.msg);
+    } catch {
       alert("Server error");
     }
   };
 
   return (
-    <div className="login-container">
-      <h2>💖 Welcome to PinkChat</h2>
-      <form onSubmit={handleSubmit} className="login-form">
-        <input
-          type="text"
-          placeholder="Enter username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <input
-          type="tel"
-          placeholder="Enter phone number"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-        />
-        <button type="submit">Login / Register</button>
+    <div className="login">
+      <h2>Login to PinkChat 💖</h2>
+      <form onSubmit={handleLogin}>
+        <input placeholder="Phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
+        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+        <button type="submit">Login</button>
       </form>
+      <p>
+        No account? <span onClick={() => setPage("register")}>Register</span>
+      </p>
+      <p>
+        <span onClick={() => setPage("forgot")}>Forgot password?</span>
+      </p>
     </div>
   );
 }
-
-export default Login;
