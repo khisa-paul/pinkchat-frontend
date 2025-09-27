@@ -1,24 +1,226 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PinkChat 💖</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <div id="root"></div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PinkChat</title>
 
-    <!-- React & Babel -->
-    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+  <!-- React & ReactDOM -->
+  <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
 
-    <!-- Components -->
-    <script type="text/babel" src="Login.js"></script>
-    <script type="text/babel" src="Register.js"></script>
-    <script type="text/babel" src="ForgotPassword.js"></script>
-    <script type="text/babel" src="Chat.js"></script>
-    <script type="text/babel" src="App.js"></script>
-  </body>
+  <!-- Babel -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #ff69b4;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 24px;
+    }
+    nav {
+      display: flex;
+      justify-content: center;
+      background: #ffb6c1;
+      padding: 10px;
+    }
+    nav button {
+      margin: 0 10px;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    nav button:hover {
+      background: #ff69b4;
+      color: white;
+    }
+    main {
+      padding: 20px;
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      border-radius: 10px;
+      margin-top: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    input {
+      width: 100%;
+      margin: 5px 0;
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button[type="submit"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      background: #ff69b4;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button[type="submit"]:hover {
+      background: #ff1493;
+    }
+    .chat-window {
+      max-height: 200px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 5px;
+      background: #f8f8f8;
+    }
+    .chat-message {
+      margin-bottom: 5px;
+      padding: 5px;
+      background: #ffe4e1;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <header>PinkChat</header>
+
+  <nav>
+    <button onclick="setPage('Login')">Login</button>
+    <button onclick="setPage('Register')">Register</button>
+    <button onclick="setPage('ForgotPassword')">Forgot Password</button>
+    <button onclick="setPage('Chat')">Chat</button>
+  </nav>
+
+  <main id="root"></main>
+
+  <script type="text/babel">
+    // Persistent state object for SPA
+    const appState = {
+      chatMessages: []
+    };
+
+    // Login Component
+    function Login() {
+      const [email, setEmail] = React.useState("");
+      const [password, setPassword] = React.useState("");
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        alert(`Email: ${email}\nPassword: ${password}`);
+      };
+
+      return (
+        <div>
+          <h2>Login</h2>
+          <form onSubmit={handleSubmit}>
+            <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
+            <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
+            <button type="submit">Login</button>
+          </form>
+        </div>
+      );
+    }
+    window.Login = Login;
+
+    // Register Component
+    function Register() {
+      const [username, setUsername] = React.useState("");
+      const [email, setEmail] = React.useState("");
+      const [password, setPassword] = React.useState("");
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        alert(`Username: ${username}\nEmail: ${email}\nPassword: ${password}`);
+      };
+
+      return (
+        <div>
+          <h2>Register</h2>
+          <form onSubmit={handleSubmit}>
+            <input type="text" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} required />
+            <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
+            <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
+            <button type="submit">Register</button>
+          </form>
+        </div>
+      );
+    }
+    window.Register = Register;
+
+    // Forgot Password Component
+    function ForgotPassword() {
+      const [email, setEmail] = React.useState("");
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        alert(`Password reset link sent to: ${email}`);
+      };
+
+      return (
+        <div>
+          <h2>Forgot Password</h2>
+          <form onSubmit={handleSubmit}>
+            <input type="email" placeholder="Enter your email" value={email} onChange={e => setEmail(e.target.value)} required />
+            <button type="submit">Send Reset Link</button>
+          </form>
+        </div>
+      );
+    }
+    window.ForgotPassword = ForgotPassword;
+
+    // Chat Component
+    function Chat() {
+      const [message, setMessage] = React.useState("");
+      const [messages, setMessages] = React.useState(appState.chatMessages);
+
+      const sendMessage = (e) => {
+        e.preventDefault();
+        if (message.trim() === "") return;
+        const newMessages = [...messages, message];
+        setMessages(newMessages);
+        appState.chatMessages = newMessages; // persist across pages
+        setMessage("");
+      };
+
+      return (
+        <div>
+          <h2>Chat</h2>
+          <div className="chat-window">
+            {messages.map((msg, idx) => <div key={idx} className="chat-message">{msg}</div>)}
+          </div>
+          <form onSubmit={sendMessage}>
+            <input value={message} onChange={e => setMessage(e.target.value)} placeholder="Type a message..." required />
+            <button type="submit">Send</button>
+          </form>
+        </div>
+      );
+    }
+    window.Chat = Chat;
+
+    // SPA page management
+    let currentPage = 'Login';
+    function setPage(page) {
+      currentPage = page;
+      renderPage();
+    }
+
+    function renderPage() {
+      const Component = window[currentPage];
+      ReactDOM.render(<Component />, document.getElementById("root"));
+    }
+
+    // Initial render
+    renderPage();
+  </script>
+</body>
 </html>
