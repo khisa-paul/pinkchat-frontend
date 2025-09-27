@@ -1,35 +1,48 @@
-function Register({ onSwitchPage }) {
-  const [username, setUsername] = React.useState("");
-  const [phone, setPhone] = React.useState("");
+<script type="text/babel">
+  function Register() {
+    const [username, setUsername] = React.useState("");
+    const [email, setEmail] = React.useState("");
+    const [password, setPassword] = React.useState("");
 
-  const handleRegister = (e) => {
-    e.preventDefault();
-    alert(`Account created for ${username} (${phone}) 🎉`);
-    onSwitchPage("login");
-  };
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      alert(`Username: ${username}\nEmail: ${email}\nPassword: ${password}`);
+      // Add your registration logic here
+    };
 
-  return (
-    <div className="login-box">
-      <h2>Register for PinkChat 💖</h2>
-      <form onSubmit={handleRegister}>
-        <input
-          type="text"
-          placeholder="Choose Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Phone Number"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-        />
-        <button type="submit">Register</button>
-      </form>
-      <p>
-        Already have an account?{" "}
-        <a href="#" onClick={() => onSwitchPage("login")}>Login</a>
-      </p>
-    </div>
-  );
-}
+    return (
+      <div>
+        <h2>Register</h2>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
+          <br/>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <br/>
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <br/>
+          <button type="submit">Register</button>
+        </form>
+      </div>
+    );
+  }
+
+  window.Register = Register;
+</script>
