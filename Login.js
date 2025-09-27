@@ -1,38 +1,40 @@
-import React, { useState } from "react";
+function Login({ onLogin, onSwitchPage }) {
+  const [username, setUsername] = React.useState("");
+  const [phone, setPhone] = React.useState("");
 
-export default function Login({ setPage, setUser }) {
-  const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
-
-  const handleLogin = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      const res = await fetch("https://your-backend-url.onrender.com/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, password }),
-      });
-      const data = await res.json();
-      if (res.ok) setUser(data.user);
-      else alert(data.msg);
-    } catch {
-      alert("Server error");
+    if (username && phone) {
+      onLogin({ username, phone });
+    } else {
+      alert("Please enter both username and phone number.");
     }
   };
 
   return (
-    <div className="login">
+    <div className="login-box">
       <h2>Login to PinkChat 💖</h2>
-      <form onSubmit={handleLogin}>
-        <input placeholder="Phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
-        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Phone Number"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+        />
         <button type="submit">Login</button>
       </form>
       <p>
-        No account? <span onClick={() => setPage("register")}>Register</span>
+        Don’t have an account?{" "}
+        <a href="#" onClick={() => onSwitchPage("register")}>Register</a>
       </p>
       <p>
-        <span onClick={() => setPage("forgot")}>Forgot password?</span>
+        <a href="#" onClick={() => onSwitchPage("forgot")}>Forgot Password?</a>
       </p>
     </div>
   );
