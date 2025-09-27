@@ -1,32 +1,21 @@
-// src/components/StatusViewer.js
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { API_BASE } from "../config";
 
 function StatusViewer({ socket }) {
   const [statuses, setStatuses] = useState([]);
 
-  // ✅ Fetch statuses from backend
   useEffect(() => {
-    const fetchStatuses = async () => {
-      try {
-        const res = await axios.get(`${API_BASE}/api/statuses`);
-        setStatuses(res.data);
-      } catch (err) {
-        console.error("Failed to fetch statuses:", err);
-      }
-    };
-    fetchStatuses();
-  }, []);
+    socket.on("receiveStatus", (status) => {
+      setStatuses((prev) => [...prev, status]);
+    });
+    return () => socket.off("receiveStatus");
+  }, [socket]);
 
   return (
     <div className="status-viewer">
-      <h3>Status Updates</h3>
-      {statuses.map((status, i) => (
-        <div key={i} className="status-item">
-          <strong>{status.user}</strong>
-          {status.text && <p>{status.text}</p>}
-          {status.imageUrl && <img src={status.imageUrl} alt="status" />}
+      <h3>Statuses</h3>
+      {statuses.map((s, i) => (
+        <div key={i}>
+          <b>{s.user}: </b> {s.text}
         </div>
       ))}
     </div>
