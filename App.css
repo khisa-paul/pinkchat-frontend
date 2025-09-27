@@ -1,0 +1,41 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.header {
+  background: pink;
+  padding: 10px;
+  font-size: 20px;
+  text-align: center;
+}
+
+.main {
+  display: flex;
+  flex: 1;
+  gap: 20px;
+  padding: 20px;
+}
+
+.chat-window,
+.status-viewer,
+.status-uploader,
+.login-container {
+  border: 1px solid #ccc;
+  padding: 10px;
+  flex: 1;
+}
+
+.messages {
+  height: 200px;
+  overflow-y: auto;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 10px;
+}
