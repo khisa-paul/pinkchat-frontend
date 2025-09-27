@@ -1,47 +1,52 @@
-function Chat({ user, onLogout }) {
-  const [messages, setMessages] = React.useState([]);
-  const [input, setInput] = React.useState("");
+// src/Chat.js
+import React, { useState, useEffect } from "react";
+import io from "socket.io-client";
+import { API_BASE } from "./config";
 
-  const sendMessage = (e) => {
-    e.preventDefault();
-    if (!input.trim()) return;
+const socket = io(API_BASE, { transports: ["websocket"], withCredentials: true });
 
-    // Add new message
-    setMessages([...messages, { user: user.username, text: input }]);
-    setInput("");
+function Chat({ user }) {
+  const [messages, setMessages] = useState([]);
+  const [text, setText] = useState("");
+
+  useEffect(() => {
+    socket.on("chatMessage", (msg) => {
+      setMessages((prev) => [...prev, msg]);
+    });
+
+    return () => socket.off("chatMessage");
+  }, []);
+
+  const sendMessage = () => {
+    if (!text.trim()) return;
+    const msg = { sender: user.username, text };
+    socket.emit("chatMessage", msg);
+    setMessages((prev) => [...prev, msg]);
+    setText("");
   };
 
   return (
-    <div className="chat-box">
-      <header className="chat-header">
-        <h2>💬 PinkChat</h2>
-        <div>
-          <span>Logged in as <b>{user?.username}</b></span>
-          <button onClick={onLogout}>Logout</button>
-        </div>
-      </header>
-
-      <div className="messages">
-        {messages.length === 0 ? (
-          <p className="empty">No messages yet. Start chatting 💖</p>
-        ) : (
-          messages.map((msg, i) => (
-            <p key={i}>
-              <b>{msg.user}:</b> {msg.text}
-            </p>
-          ))
-        )}
+    <div style={{ padding: "20px" }}>
+      <h2>Welcome {user?.username} 💬</h2>
+      <div style={{ border: "1px solid #ccc", borderRadius: "10px", padding: "10px", height: "200px", overflowY: "auto", marginBottom: "10px" }}>
+        {messages.map((msg, i) => (
+          <div key={i} style={{ textAlign: "left", margin: "5px 0" }}>
+            <strong>{msg.sender}:</strong> {msg.text}
+          </div>
+        ))}
       </div>
-
-      <form onSubmit={sendMessage} className="chat-input">
-        <input
-          type="text"
-          placeholder="Type a message..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-        />
-        <button type="submit">Send</button>
-      </form>
+      <input
+        type="text"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        placeholder="Type a message..."
+        style={{ width: "70%", padding: "5px" }}
+      />
+      <button onClick={sendMessage} style={{ padding: "5px 10px", marginLeft: "5px" }}>
+        Send
+      </button>
     </div>
   );
 }
+
+export default Chat;
