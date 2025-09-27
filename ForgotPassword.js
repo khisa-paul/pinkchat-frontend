@@ -1,32 +1,26 @@
-import React, { useState } from "react";
+function ForgotPassword({ onSwitchPage }) {
+  const [phone, setPhone] = React.useState("");
 
-export default function ForgotPassword({ setPage }) {
-  const [phone, setPhone] = useState("");
-
-  const handleForgot = async (e) => {
+  const handleReset = (e) => {
     e.preventDefault();
-    try {
-      const res = await fetch("https://your-backend-url.onrender.com/api/auth/forgot", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone }),
-      });
-      const data = await res.json();
-      alert(data.msg);
-    } catch {
-      alert("Server error");
-    }
+    alert(`Password reset link sent to phone: ${phone}`);
+    onSwitchPage("login");
   };
 
   return (
-    <div className="forgot">
-      <h2>Forgot Password</h2>
-      <form onSubmit={handleForgot}>
-        <input placeholder="Phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
-        <button type="submit">Submit</button>
+    <div className="login-box">
+      <h2>Forgot Password 💖</h2>
+      <form onSubmit={handleReset}>
+        <input
+          type="text"
+          placeholder="Enter Phone Number"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+        />
+        <button type="submit">Send Reset Link</button>
       </form>
       <p>
-        Back to <span onClick={() => setPage("login")}>Login</span>
+        <a href="#" onClick={() => onSwitchPage("login")}>Back to Login</a>
       </p>
     </div>
   );
